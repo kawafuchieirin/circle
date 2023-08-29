@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  
+  aws-cli: circleci/aws-cli@4.0.0
 
 jobs:
   execute-cloudformation:
@@ -21,9 +21,7 @@ jobs:
             aws cloudformation deploy --template cloudformation/cfn-rds.yml --stack-name RDS
             aws cloudformation deploy --template cloudformation/cfn-alb.yml --stack-name ALB
 
-  
 workflows:
-  raisetech:
+  circleci-live-demo-20230819-workflow:
     jobs:
       - execute-cloudformation
-
