@@ -19,7 +19,6 @@ jobs:
           name: deploy CloudFormation
           command: |
             set -x
-            aws cloudformation deploy --template cloudformation/cfn-controlnode.yml --stack-name controlnode
             aws cloudformation deploy --template cloudformation/cfn-vpc.yml --stack-name VPC
             aws cloudformation deploy --template cloudformation/cfn-ec2.yml --stack-name EC2
             aws cloudformation deploy --template cloudformation/cfn-rds.yml --stack-name RDS
