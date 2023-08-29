@@ -2,7 +2,10 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@4.0.0
+  ansible-playbook: orbss/ansible-playbook@0.0.5
 
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
   execute-cloudformation:
     executor: aws-cli/default
@@ -16,12 +19,30 @@ jobs:
           name: deploy CloudFormation
           command: |
             set -x
+            aws cloudformation deploy --template cloudformation/cfn-controlnode.yml --stack-name controlnode
             aws cloudformation deploy --template cloudformation/cfn-vpc.yml --stack-name VPC
             aws cloudformation deploy --template cloudformation/cfn-ec2.yml --stack-name EC2
             aws cloudformation deploy --template cloudformation/cfn-rds.yml --stack-name RDS
             aws cloudformation deploy --template cloudformation/cfn-alb.yml --stack-name ALB
 
+
+  execute-ansible:
+    executor: ansible-playbook/default
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "3d:c6:85:94:35:db:a3:d9:b0:79:a1:eb:10:87:9f:1e"
+      - ansible-playbook/install:
+          version: 2.10.7
+      - ansible-playbook/playbook:
+          playbook: ansible/playbook.yml
+          playbook-options: '-u ec2-user -i ansible/inventory --private-key  "C:\Users\eirin\OneDrive\デスクトップ\ansible-project\control.pem.txt"'
+
 workflows:
   circleci-live-demo-20230819-workflow:
     jobs:
       - execute-cloudformation
+      - execute-ansible:
+          requires:
+            - execute-cloudformation
